@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html><head>
-<title>Klasse Xopt</title>
+<title>Class Xopt</title>
 <link REL="stylesheet" HREF="rubydoc.css">
 </head>
 <body>
@@ -39,7 +39,7 @@ end
 <h2 class="method_heading">Class methods</h2>
 
 <dl>
-<dt class="method"><b class="method">getopt</b>   Xopt.getopt(<i>anArray</i>, <i>anArray</i>=ARGV) » <i>aXopt</i></dt>
+<dt class="method"><b class="method">getopt</b>   Xopt.getopt(<i>anArray</i>, <i>anArray</i>=ARGV) Â» <i>aXopt</i></dt>
 
 <dd class="method">
 This method executes all necessary steps in a bundle, so that no further methods are necessary. The options defined in the first argument are searched for and removed in the second argument. Returns an object of the class Xopt, which contains all options with their determined values.
@@ -60,7 +60,7 @@ The getopt method is merely an abbreviation for the combination of new and get, 
 
 </dd>
 
-<dt class="method"><b class="method">new</b>   Xopt.new([<i>anArray</i>]) » <i>aXopt</i></dt>
+<dt class="method"><b class="method">new</b>   Xopt.new([<i>anArray</i>]) Â» <i>aXopt</i></dt>
 
 <dd class="method">
 Creates a new instance of Xopt. Gets an Array with options to be added as optional argument. Array is passed to Xopt#add.
@@ -78,7 +78,7 @@ p x.class   # => Xopt
 <p>The Xopt class provides six methods for its members. The method get extracts options from a field (usually the command line). The failed? and failure methods are used for error handling, to_hash and to_struct provide the found options.
 <dl>
 
-<dt class="method"><b class="method">add</b>   <i>xopt</i>.add(<i>anArray</i>, <i>anArray</i>=ARGV) » <i>xopt</i></dt>
+<dt class="method"><b class="method">add</b>   <i>xopt</i>.add(<i>anArray</i>, <i>anArray</i>=ARGV) Â» <i>xopt</i></dt>
 <dd class="method">
 Adds option pattern from the first argument to self, this method is automatically called by new for the newly created object.
 <pre class="example">
@@ -136,7 +136,7 @@ p x.to_hash["verbose"]  # -> true
 
 
 
-<dt class="method"><b class="method">failed?</b>   <i>xopt</i>.failed? » <code>true</code> or <code>false</code></dt>
+<dt class="method"><b class="method">failed?</b>   <i>xopt</i>.failed? Â» <code>true</code> or <code>false</code></dt>
 
 <dd class="method">
 Tests whether an error occurred when get was called.
@@ -151,7 +151,7 @@ p x.failed?  # -> true
 
 </dd>
 
-<dt class="method"><b class="method">failure</b>   <i>xopt</i>.failure » <i>aXopt::Failure</i> or <code>nil</code></dt>
+<dt class="method"><b class="method">failure</b>   <i>xopt</i>.failure Â» <i>aXopt::Failure</i> or <code>nil</code></dt>
 
 <dd class="method">
 Returns nil or an error that occurred when calling get as an object of the class Xopt::Failure.
@@ -159,14 +159,14 @@ Returns nil or an error that occurred when calling get as an object of the class
 <pre class="example">
 x = Xopt.getopt(%w"a b", %w[-a -y])
 if x.failed?
-   $stderr.puts "Ungültige Option #{x.failure.argument}"
+   $stderr.puts "UngÃ¼ltige Option #{x.failure.argument}"
 end   
 </pre>
 
 </dd>
 
 
-<dt class="method"><b class="method">get</b>   <i>xopt</i>.get(<i>array</i>=ARGV) » <i>xopt</i></dt>
+<dt class="method"><b class="method">get</b>   <i>xopt</i>.get(<i>array</i>=ARGV) Â» <i>xopt</i></dt>
 
 <dd class="method">
 Segregates options from argument and sets value of option in self.
@@ -199,7 +199,7 @@ p x.to_struct.file    # -> "d"
 
 </dd>
 
-<dt class="method"><b class="method">to_hash</b>   <i>xopt</i>.to_hash » <i>aHash</i></dt>
+<dt class="method"><b class="method">to_hash</b>   <i>xopt</i>.to_hash Â» <i>aHash</i></dt>
 
 <dd class="method">
 Returns a hash table whose keys are the names of the options. The corresponding values are the values of the options. This method is particularly useful for accessing the names and values of all options at the same time.
@@ -214,7 +214,7 @@ p hash        # -> {"a"=>true, "b"=>false, "file"=>"/bin"}
 
 </dd>
 
-<dt class="method"><b class="method">to_struct</b>   <i>xopt</i>.to_struct » <i>aStruct</i></dt>
+<dt class="method"><b class="method">to_struct</b>   <i>xopt</i>.to_struct Â» <i>aStruct</i></dt>
 
 <dd class="method">
 Returns structure whose members are the names of the options. The values of the members are the values of the options. This method is particularly useful for accessing the values of individual options.
@@ -264,14 +264,14 @@ p x.failure.part     # -> "x"
 
 <dl>
 
-<dt class="method"><b class="method">argument</b>   <i>failure</i>.argument » <i>aString</i></dt>
+<dt class="method"><b class="method">argument</b>   <i>failure</i>.argument Â» <i>aString</i></dt>
 
 <dd class="method">Returns the argument that caused the error.
 </dd>
 
 
 
-<dt class="method"><b class="method">cluster?</b>   <i>failure</i>.cluster » <code>true</code> or <code>false</code></dt>
+<dt class="method"><b class="method">cluster?</b>   <i>failure</i>.cluster Â» <code>true</code> or <code>false</code></dt>
 
 <dd class="method">Specifies whether the error occurred when processing an option cluster.
 
@@ -283,7 +283,7 @@ p Xopt.new(%w(a b)).get(%w[--axb]).failure.cluster?  # -> false
 </dd>
 
 
-<dt class="method"><b class="method">kind</b>   <i>failure</i>.kind » <i>aSymbol</i></dt>
+<dt class="method"><b class="method">kind</b>   <i>failure</i>.kind Â» <i>aSymbol</i></dt>
 
 <dd class="method">Returns a symbol that specifies the error.
 
@@ -302,7 +302,7 @@ p Xopt.new(%w(a bert benz)).get(%w[--be]).failure.kind  # -> :ambiguous
 
 </dd>
 
-<dt class="method"><b class="method">options</b>   <i>failure</i>.options » <i>anArray</i> </dt>
+<dt class="method"><b class="method">options</b>   <i>failure</i>.options Â» <i>anArray</i> </dt>
 
 <dd class="method">Returns a field of all option names that can be assigned to the error.
 
@@ -314,7 +314,7 @@ p Xopt.new(%w(a bert benz)).get(%w[--be]).failure.options  # -> ["benz", "bert"]
 
 </dd>
 
-<dt class="method"><b class="method">part</b>   <i>failure</i>.part » <i>aString</i> oder <code>nil</code></dt>
+<dt class="method"><b class="method">part</b>   <i>failure</i>.part Â» <i>aString</i> oder <code>nil</code></dt>
 
 <dd class="method">If the error occurred during processing of a cluster, 'part' returns the part of the argument that caused the error, otherwise part returns <code>nil</code>.
 </pre> 
