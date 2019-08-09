@@ -1,4 +1,4 @@
-# ruby-option-parser
+# ruby-option-parser class Xopt
 According to the UNIX philosophy: This option parser parses options well. Full stop.
 
 This tool was written by my colleague in the nineties. He was one of the first german ruby programmers and wrote the first german ruby-book.
