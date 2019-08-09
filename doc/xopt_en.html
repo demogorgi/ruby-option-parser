@@ -1,0 +1,383 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head>
+<title>Klasse Xopt</title>
+<link REL="stylesheet" HREF="rubydoc.css">
+</head>
+<body>
+<h1 class="class_heading">Xopt <b class="inherit_heading">&lt; Object</b></h1>
+
+Simple but extensible class to evaluate command line options.
+
+<p>Minimal example:
+
+<pre class="example">
+require "xopt.rb"
+
+opt = Xopt.getopt %w(login n file|f=/dev/null sepp|s safran)
+puts "List of all options:"
+opt.to_hash.each do |k,v|
+   puts "#{k}:\t #{v}"
+end
+
+puts "\nRemaining arguments: #{ARGV.inspect}"
+</pre>
+
+<p>Example with error handling:
+<pre class="example">
+require "xopt.rb"
+
+ARGV.push *%(--lo -sn) if ARGV.empty?
+opt = Xopt.getopt %w(login n file|f=/dev/null sepp|s safran)
+if opt.failed?
+  $stderr.puts "The given options are unfortunately faulty."
+  exit 1      
+end
+</pre>
+
+<p>You can derive subclasses from the class that use a style other than the default style to evaluate options. Three derived classes are defined at the end of this article: Gnu, Classic and Dos.
+
+<h2 class="method_heading">Class methods</h2>
+
+<dl>
+<dt class="method"><b class="method">getopt</b>   Xopt.getopt(<i>anArray</i>, <i>anArray</i>=ARGV) » <i>aXopt</i></dt>
+
+<dd class="method">
+This method executes all necessary steps in a bundle, so that no further methods are necessary. The options defined in the first argument are searched for and removed in the second argument. Returns an object of the class Xopt, which contains all options with their determined values.
+   
+<pre class="example">
+args = %w[-a --file /bin A B C]
+x = Xopt.getopt(%w[a b file= name=], args)
+s = x.to_struct
+p args    # -> ["A", "B", "C"]
+p s.a     # -> true
+p s.b     # -> false
+p s.file  # -> "/bin"
+p s.name  # -> ""
+
+</pre>
+
+The getopt method is merely an abbreviation for the combination of new and get, that is, <p><code>getopt(a,b)</code> is equivalent to <code>new(a).get(b)</code>.
+
+</dd>
+
+<dt class="method"><b class="method">new</b>   Xopt.new([<i>anArray</i>]) » <i>aXopt</i></dt>
+
+<dd class="method">
+Creates a new instance of Xopt. Gets an Array with options to be added as optional argument. Array is passed to Xopt#add.
+<pre class="example">
+x = Xopt.new %w(a b)
+p x.class   # => Xopt
+</pre>
+</dd>
+
+
+</dl>
+
+<h2 class="method_heading">Methods</h2>
+
+<p>The Xopt class provides six methods for its members. The method get extracts options from a field (usually the command line). The failed? and failure methods are used for error handling, to_hash and to_struct provide the found options.
+<dl>
+
+<dt class="method"><b class="method">add</b>   <i>xopt</i>.add(<i>anArray</i>, <i>anArray</i>=ARGV) » <i>xopt</i></dt>
+<dd class="method">
+Adds option pattern from the first argument to self, this method is automatically called by new for the newly created object.
+<pre class="example">
+x = Xopt.new %w(a b)
+p x.to_hash.keys   # -> ["a", "b"]
+x.add %w(x y)
+p x.to_hash.keys   # -> ["a", "b", "x", "y"]
+x.get %w(-a -x)
+p x.to_hash        # -> {"a"=>true, "b"=>false, "x"=>true, "y"=>false} 
+</pre>
+
+
+<p>Options that contain an equal sign in the definition have an argument, behind the equal sign there can be a default value.
+
+<pre class="example">
+x = Xopt.new %w(a= b=default c=)
+p x.to_hash.keys   # -> ["a", "b"]
+x.get %w(-a wert)
+p x.to_hash        # -> {"a"=>"wert", "b"=>"default", "c"=>nil}
+</pre>
+
+<p>The Xopt class additionally supports two special types of options. They are identified by special signatures during definition.
+
+<h3>Counting options</h3>
+Counting options start with a #. They count from zero to the number of their occurrence.
+
+<pre class="example">
+x = Xopt.new %w(a #i #k)
+x.get %w(-a -a -i -i )
+p x.to_hash        # -> {"k"=>0, "a"=>true, "i"=>2} 
+</pre>
+
+<h3>Field options</h3>
+Field options begin with the signature []. They can occur multiple times in a command line and collect all their arguments in one field.
+
+<pre class="example">
+x = Xopt.new %w([]a []b []c)
+x.get %w(-a Eins -a Zwei -b X -b Y)
+p x.to_hash        # -> {"a"=>["Eins", "Zwei"], "b"=>["X", "Y"], "c"=>[]} 
+</pre>
+
+<h3>Synonyme</h3>
+<p>An option can be addressed under several names. The individual names are separated in the option string by "|". The option can be used in the program under the first name.
+
+<pre class="example">
+x = Xopt.getopt %w(v|verbose)
+p x.to_hash.keys        # -> ["v"]
+
+x = Xopt.getopt %w(verbose|v) 
+p x.to_hash.keys        # -> ["verbose"]
+x.get ["-v"]
+p x.to_hash["verbose"]  # -> true
+</pre> 
+</dd>
+
+
+
+<dt class="method"><b class="method">failed?</b>   <i>xopt</i>.failed? » <code>true</code> or <code>false</code></dt>
+
+<dd class="method">
+Tests whether an error occurred when get was called.
+
+<pre class="example">
+x = Xopt.getopt(%w"a b", %w[-a -b])
+p x.failed?  # -> false
+
+x = Xopt.getopt(%w"a b", %w[-a -x])
+p x.failed?  # -> true
+</pre>
+
+</dd>
+
+<dt class="method"><b class="method">failure</b>   <i>xopt</i>.failure » <i>aXopt::Failure</i> or <code>nil</code></dt>
+
+<dd class="method">
+Returns nil or an error that occurred when calling get as an object of the class Xopt::Failure.
+
+<pre class="example">
+x = Xopt.getopt(%w"a b", %w[-a -y])
+if x.failed?
+   $stderr.puts "Ungültige Option #{x.failure.argument}"
+end   
+</pre>
+
+</dd>
+
+
+<dt class="method"><b class="method">get</b>   <i>xopt</i>.get(<i>array</i>=ARGV) » <i>xopt</i></dt>
+
+<dd class="method">
+Segregates options from argument and sets value of option in self.
+
+<pre class="example">
+x = Xopt.new %w(a b file=)
+x.get %w(-a --file /bin)
+p x.to_hash # -> {"a"=>true, "b"=>false, "file"=>"/bin"}
+</pre>
+<h3>Clustering options in the command line</h3>
+<p>Options whose names are only one character long can be clustered.
+<pre class="example">
+x = Xopt.new %w(#verbose|v #debug|d file|f=)
+x.get %w(-vdv -dvdf /dev/null)
+s = x.to_struct
+p s.verbose  # -> 3
+p s.debug    # -> 3
+p s.file     # -> "/dev/null"
+</pre> 
+
+<p>Options that require an argument may only be last in the cluster, otherwise they take the rest of the cluster as an argument.
+
+<pre class="example">
+x = Xopt.new %w(#debug|d file|f=)
+x.get %w(-fd /dev/null)
+p x.to_struct.file    # -> "d"
+</pre> 
+
+
+
+</dd>
+
+<dt class="method"><b class="method">to_hash</b>   <i>xopt</i>.to_hash » <i>aHash</i></dt>
+
+<dd class="method">
+Returns a hash table whose keys are the names of the options. The corresponding values are the values of the options. This method is particularly useful for accessing the names and values of all options at the same time.
+
+
+<pre class="example">
+x = Xopt.getopt(%w"a b file=", %w[-a --file=/bin])
+hash = x.to_hash
+p hash.keys   # -> ["a", "b", "file"]
+p hash        # -> {"a"=>true, "b"=>false, "file"=>"/bin"}
+</pre>
+
+</dd>
+
+<dt class="method"><b class="method">to_struct</b>   <i>xopt</i>.to_struct » <i>aStruct</i></dt>
+
+<dd class="method">
+Returns structure whose members are the names of the options. The values of the members are the values of the options. This method is particularly useful for accessing the values of individual options.
+
+<pre class="example">
+opt = Xopt.getopt(%w"a b file=", %w[-a --file /bin])
+s = opt.to_struct
+p s.members  # -> ["a", "b", "file"]
+p s.values   # -> [true, false, "/bin"]
+</pre> 
+
+</dd>
+
+</dl>
+
+
+<h1 class="class_heading">Xopt::Failure <b class="inherit_heading">&lt; Object</b></h1>
+
+Objects of these classes are returned by Xopt#failure if the evaluation of the options failed. The class provides five methods that specify the location and type of the error that occurred.
+
+<pre class="example">
+# Example of ambiguous option
+x = Xopt.getopt(%w(a file= finger), %w(-a --fi))
+p x.failed?          # -> true
+p x.failure.cluster? # -> false
+p x.failure.argument # -> "--fi"
+p x.failure.kind     # -> :ambiguous
+p x.failure.options  # -> ["finger", "file"]
+
+# Example for missing argument
+x = Xopt.getopt(%w(a file=), %w(-a --fi))
+p x.failed?          # -> true
+p x.failure.cluster? # -> false
+p x.failure.argument # -> "--fi"
+p x.failure.kind     # -> :argument_required
+p x.failure.options  # -> ["file"]
+
+# Example of an unknown component in a cluster
+x = Xopt.getopt(%w(a f), %w(-axf))
+p x.failed?          # -> true
+p x.failure.cluster? # -> true
+p x.failure.argument # -> "-axf"
+p x.failure.kind     # -> :unknown
+p x.failure.options  # -> []
+p x.failure.part     # -> "x"
+</pre> 
+
+<dl>
+
+<dt class="method"><b class="method">argument</b>   <i>failure</i>.argument » <i>aString</i></dt>
+
+<dd class="method">Returns the argument that caused the error.
+</dd>
+
+
+
+<dt class="method"><b class="method">cluster?</b>   <i>failure</i>.cluster » <code>true</code> or <code>false</code></dt>
+
+<dd class="method">Specifies whether the error occurred when processing an option cluster.
+
+<pre class="example">
+p Xopt.new(%w(a b)).get(%w[-axb]).failure.cluster?   # -> true
+p Xopt.new(%w(a b)).get(%w[--axb]).failure.cluster?  # -> false
+</pre> 
+
+</dd>
+
+
+<dt class="method"><b class="method">kind</b>   <i>failure</i>.kind » <i>aSymbol</i></dt>
+
+<dd class="method">Returns a symbol that specifies the error.
+
+<table class="x">
+<tr><th>Wert von .kind    <th>Meaning</tr>
+<tr><td>:unknown          <td>Unknown option</tr>
+<tr><td>:ambigous         <td>Ambiguous (abbreviated) option</tr>
+<tr><td>:argument_required<td>Required argument missing</tr>
+</table>
+
+<pre class="example">
+p Xopt.new(%w(a b)).get(%w[--x]).failure.kind           # -> :unknown
+p Xopt.new(%w(a b=)).get(%w[--b]).failure.kind          # -> :argument_required
+p Xopt.new(%w(a bert benz)).get(%w[--be]).failure.kind  # -> :ambiguous
+</pre>
+
+</dd>
+
+<dt class="method"><b class="method">options</b>   <i>failure</i>.options » <i>anArray</i> </dt>
+
+<dd class="method">Returns a field of all option names that can be assigned to the error.
+
+<pre class="example">
+p Xopt.new(%w(a b)).get(%w[--x]).failure.options           # -> []
+p Xopt.new(%w(a b=)).get(%w[--b]).failure.options          # -> ["b"]
+p Xopt.new(%w(a bert benz)).get(%w[--be]).failure.options  # -> ["benz", "bert"]
+</pre> 
+
+</dd>
+
+<dt class="method"><b class="method">part</b>   <i>failure</i>.part » <i>aString</i> oder <code>nil</code></dt>
+
+<dd class="method">If the error occurred during processing of a cluster, 'part' returns the part of the argument that caused the error, otherwise part returns <code>nil</code>.
+</pre> 
+<pre class="example">
+p Xopt.new(%w(a b)).get(%w[-axb]).failure.part   # -> "x"
+p Xopt.new(%w(a b)).get(%w[--axb]).failure.part  # -> nil
+</pre> 
+
+</dd>
+
+
+
+</dl>
+
+<h1 class="class_heading">Xopt::Gnu <b class="inherit_heading">&lt; Xopt</b></h1>
+
+<p>The options are evaluated in Gnu style. This means in detail: 
+<ul>
+<li>Long options start with '--', short (one-letter) options with '-'.
+<li>Short options may be clustered.
+<li>Short options must not be separated from their argument by a '='. 
+</ul>
+
+<pre class="example">
+x = Xopt::Gnu.new %w(a b file=)
+x.get %w[-ab --file=/dev/null]
+
+p x.to_hash  # -> {"a"=>true, "b"=>true, "file"=>"/dev/null"}
+</pre> 
+
+<h1 class="class_heading">Xopt::Classic <b class="inherit_heading">&lt; Xopt</b></h1>
+<p>The options are evaluated in the classic Unix style.  This means in detail:
+
+<ul>
+<li>All options start with a single minus sign '-'.
+<li>Short options may be clustered.
+<li>Short options may be separated from their argument only by a space or nothing.
+</ul>
+
+<pre class="example">
+x = Xopt::Classic.new %w(a b file=)
+x.get %w[-ab -file=/dev/null]
+p x.to_hash  # -> {"a"=>true, "b"=>true, "file"=>"/dev/null"}
+</pre> 
+
+
+
+
+<h1 class="class_heading">Xopt::Dos <b class="inherit_heading">&lt; Xopt</b></h1>
+
+<p>The options are evaluated in Dos style. This means in detail: 
+<ul>
+<li>Options start with a slash /.
+<li>Options are not case-sensitive. 
+<li>Options may also stand behind normal arguments.
+<li>Options must not be abbreviated.
+<li>Between an option and its argument there may be a space or a colon.
+</ul>
+
+<pre class="example">
+x = Xopt::Dos.new %w(a b file=)
+x.get %w[argument /a /B /file:config.sys]
+p x.to_hash  # -> {"a"=>true, "b"=>true, "file"=>"config.sys"}
+</pre> 
+
+</body></html>

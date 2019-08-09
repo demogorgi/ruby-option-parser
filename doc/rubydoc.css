@@ -1,0 +1,79 @@
+
+body {
+    margin-left: 5%;
+    margin-right: 10%;
+}
+
+.method_heading {
+    color: white;
+    padding-top: 0.2em;
+    padding-bottom: 0.1em;
+    padding-left: 0.5em;
+    background: #994400;
+    
+}
+
+.class_heading {
+    color: white;
+    padding-top: 0.2em;
+    padding-bottom: 0.1em;
+    padding-left: 0.5em;
+    background: #aa55ee;
+}
+
+b.inherit_heading {
+    margin-left: 1em;
+    font-size: 80%;
+}
+
+
+
+dt.method {
+    background: #fFb0b0;
+    margin-left: 0em;
+    display: table;
+    width: 100%;
+    padding-top: 0.2em;
+    padding-left: 0.2em;
+    padding-bottom: 0.13em;
+    font-weight: normal;
+    font-size: 100%;
+    margin-bottom: 1ex;
+}
+
+dd.method {
+    margin-left: 1em;
+    width: 97%;
+    margin-bottom: 1em;
+}
+
+
+table.x {
+    margin-left: 2em;
+    display: table;
+    background: #fFe0a0;
+    font-size: 90%;
+}
+
+b.method {
+    font-weight: bold;
+    font-size: 120%;
+    padding-right: 1.5em;
+}
+
+pre.example {
+    border-right: #646464 1px solid;
+    padding-right: 0.5em;
+    border-top: #646464 1px solid;
+    padding-top: 0.5em;
+    border-left: #646464 1px solid;
+    padding-left: 0.5em;
+    border-bottom: #646464 1px solid;
+    padding-bottom: 0.5em;
+    white-space: pre;
+    background-color: #f6f6f6;
+    margin-left: 0.2em;
+    width: 90%;
+    display: table;
+}
+
